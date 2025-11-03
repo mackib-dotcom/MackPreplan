@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: fire-preplan-backend
+    env: node
+    rootDir: backend
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        value: "your_secret_key_here"
+      - key: SHARE_SECRET
+        value: "your_share_secret_here"
+      - key: PORT
+        value: "10000"
+      - key: NODE_ENV
+        value: "production"
+    disk:
+      name: fire-preplan-data
+      mountPath: /mnt/data
+      sizeGB: 1
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
+
+  - type: web
+    name: fire-preplan-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "build"
+    autoDeploy: true
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: fire-preplan-backend
+          type: web
+          property: host
